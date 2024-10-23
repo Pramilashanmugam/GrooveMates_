@@ -29,13 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zx99)6xww5__!u=bk*mm0z6c6bi9)-wpx%y2v3qtm=t@y@=us4'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8000-pramilashan-groovemates-eommjup5mkz.ws.codeinstitute-ide.net',
-                os.environ.get('ALLOWED_HOST'),]
+ALLOWED_HOSTS = ['8000-pramilashan-groovemates-eommjup5mkz.ws.codeinstitute-ide.net',]
 
 
 # Application definition
@@ -112,7 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
