@@ -27,6 +27,7 @@ class Post(models.Model):
     'images/' directory by default.
               If no image is provided, a default image
               ('../default_post_xxhr8e') is used.
+    
     Meta:
     - The posts are ordered in descending order of their creation time
     (`-created_at`).
@@ -34,6 +35,15 @@ class Post(models.Model):
     - __str__: Returns a string representation of the post, displaying its
     ID and event name.
     """
+    image_filter_choices = [
+        ('_1977', '1977'), ('brannan', 'Brannan'),
+        ('earlybird', 'Earlybird'), ('hudson', 'Hudson'),
+        ('inkwell', 'Inkwell'), ('lofi', 'Lo-Fi'),
+        ('kelvin', 'Kelvin'), ('normal', 'Normal'),
+        ('nashville', 'Nashville'), ('rise', 'Rise'),
+        ('toaster', 'Toaster'), ('valencia', 'Valencia'),
+        ('walden', 'Walden'), ('xpro2', 'X-pro II')
+    ]
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -44,6 +54,9 @@ class Post(models.Model):
     time = models.TimeField(default=timezone.now, blank=True)
     image = models.ImageField(
         upload_to='images/', default='../default_post_xxhr8e', blank=True
+    )
+    image_filter = models.CharField(
+        max_length=32, choices=image_filter_choices, default='normal'
     )
 
     class Meta:
