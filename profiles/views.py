@@ -1,4 +1,5 @@
 from django.http import Http404
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Profile
@@ -44,15 +45,45 @@ class ProfileList(APIView):
 
 
 class ProfileDetail(APIView):
+    """
+    ProfileDetail API view to retrieve, update, or handle individual profile
+    instances.
+    Methods:
+    --------
+    get_object(pk):
+        Retrieves the Profile object with the specified primary key (pk).
+        Raises Http404 if the profile does not exist.
+    get(request, pk):
+        Handles GET requests. Retrieves a Profile object by its primary key(pk)
+        and returns serialized data in the response.
+    put(request, pk):
+        Handles PUT requests. Updates an existing Profile object with the data
+        provided in the request. If the data is valid, the profile is updated,
+        and serialized data is returned in the response.Otherwise, returns
+        validation errors with status 400.
+    Attributes:
+    -----------
+    serializer_class:
+        Specifies the serializer class used for serialization of Profile obj.
+    """
+    serializer_class = ProfileSerializer
+
     def get_object(self, pk):
         try:
             profile = Profile.objects.get(pk=pk)
             return profile
         except Profile.DoesNotExist:
             raise Http404
-    
-    def get(self,request,pk):
+
+    def get(self, request, pk):
         profile = self.get_object(pk)
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
-    
+
+    def put(self, request, pk):
+        profile = self.get_object(pk)
+        serializer = ProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
