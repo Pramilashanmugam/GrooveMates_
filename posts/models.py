@@ -27,7 +27,14 @@ class Post(models.Model):
     'images/' directory by default.
               If no image is provided, a default image
               ('../default_post_xxhr8e') is used.
-    
+    image_filter:
+    A CharField representing the type of filter to be applied to the post's
+    image. The filter choices include a variety of predefined filters,
+    allowing users to select from popular image styles. The default filter
+    is 'Normal'.
+    Example usage:
+    - A user may choose a filter like 'Hudson' to give their image a distinct
+    visual effect.
     Meta:
     - The posts are ordered in descending order of their creation time
     (`-created_at`).
