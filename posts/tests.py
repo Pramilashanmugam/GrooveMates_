@@ -7,16 +7,29 @@ from django.core.exceptions import ValidationError
 
 
 class PostListViewTests(APITestCase):
+    """
+    Test case for the Post list and creation views.
+
+    This test suite covers the following scenarios:
+    - Listing posts by logged-in users.
+    - Creating posts by logged-in users.
+    - Ensuring that users must be logged in to create posts.
+    - Validating image filter choices when creating a post.
+    """
+
     def setUp(self):
+        """Set up the test case with a user instance."""
         self.user = User.objects.create_user(username='adam', password='pass')
 
     def test_can_list_posts(self):
+        """Test that a logged-in user can list posts."""
         Post.objects.create(owner=self.user, event='Sample Event', location='Sample Location')
         response = self.client.get('/posts/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_logged_in_user_can_create_post(self):
+        """Test that a logged-in user can create a post."""
         self.client.login(username='adam', password='pass')
         
         response = self.client.post('/posts/', {
@@ -33,6 +46,7 @@ class PostListViewTests(APITestCase):
         self.assertEqual(Post.objects.count(), 1)
 
     def test_user_not_logged_in_cant_create_post(self):
+        """Test that a user must be logged in to create a post."""
         response = self.client.post('/posts/', {
             'event': 'Unauthorized Event',
             'location': 'Unauthorized Location'
@@ -40,6 +54,7 @@ class PostListViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_image_filter_choices(self):
+        """Test validation for image filter choices."""
         with self.assertRaises(ValidationError):
             post = Post(
                 owner=self.user,
