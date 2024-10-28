@@ -63,3 +63,33 @@ class PostListViewTests(APITestCase):
                 image_filter='invalid_filter'  # Invalid choice
             )
             post.full_clean()  # Should raise ValidationError
+    
+    def test_user_cannot_update_others_post(self):
+        """Test that a user cannot update another user's post."""
+        another_user = User.objects.create_user(username='anotheruser',
+                                                password='anotherpass')
+        post = Post.objects.create(owner=another_user, event='Another Event',
+                                location='Location')
+
+        self.client.login(username='adam', password='pass')
+        response = self.client.put(f'/posts/{post.id}/', {
+            'event': 'Unauthorized Update',
+            'location': 'New Location',
+            'date': timezone.now().date(),
+            'time': timezone.now().time()
+        })
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_user_cannot_delete_others_post(self):
+        """Test that a user cannot delete another user's post."""
+        another_user = User.objects.create_user(username='anotheruser',
+                                                password='anotherpass')
+        post = Post.objects.create(owner=another_user, event='Another Event',
+                                location='Location')
+
+        self.client.login(username='adam', password='pass')
+        response = self.client.delete(f'/posts/{post.id}/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Post.objects.count(), 1)  # Ensure the post still exists
+
