@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 from .models import Comment
 from .serializers import CommentSerializer
+from .permissions import IsCommentOwner  # Import your custom permission
 
 class CommentList(generics.ListCreateAPIView):
     """
@@ -20,9 +21,9 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve a comment by ID, or update or delete it if the user is the owner.
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsCommentOwner]  # Apply permissions here
 
     def perform_update(self, serializer):
         """
@@ -35,4 +36,3 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
         Perform the delete action on the comment instance.
         """
         instance.delete()
-
