@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Profile
 from followers.models import Follower
 
-
 class ProfileSerializer(serializers.ModelSerializer):
     """
     ProfileSerializer serializes the Profile model and provides additional
@@ -25,7 +24,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     - `model`: The Profile model.
     - `fields`: Specifies which fields to include in the serialized output.
       These fields include `id`, `owner`, `created_at`, `updated_at`, `name`,
-      `description`, `image`, `is_owner`, and `following_id`.
+      `description`, `image`, `is_owner`, `following_id`, `posts_count`, 
+      `followers_count`, and `following_count`.
     """
     owner = serializers.ReadOnlyField(source='owner.username')
     is_owner = serializers.SerializerMethodField()
@@ -52,4 +52,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'owner', 'created_at', 'updated_at', 'name',
             'description', 'image', 'is_owner', 'following_id',
+            'posts_count', 'followers_count', 'following_count'
         ]
