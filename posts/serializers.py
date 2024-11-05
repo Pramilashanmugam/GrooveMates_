@@ -61,8 +61,8 @@ class PostSerializer(serializers.ModelSerializer):
     profile_id = serializers.ReadOnlyField(source='owner.profile.id')
     profile_image = serializers.ReadOnlyField(source='owner.profile.image.url')
     like_id = serializers.SerializerMethodField()
-    date = serializers.DateField()
-    time = serializers.TimeField()
+    date = serializers.DateField(format="%d %b %Y")
+    time = serializers.TimeField(format="%H:%M")
 
     def validate_image(self, value):
         if value.size > 1024 * 1024 * 2:
