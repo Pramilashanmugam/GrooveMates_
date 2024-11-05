@@ -1,38 +1,51 @@
 from rest_framework import generics, permissions
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Comment
 from .serializers import CommentSerializer
-from .permissions import IsCommentOwner  # Import your custom permission
+from .permissions import IsCommentOwner
+
 
 class CommentList(generics.ListCreateAPIView):
     """
-    List all comments or create a new comment if the user is authenticated.
+    API view to list all comments or create a new comment.
+
+    - Allows any user to view comments.
+    - Authenticated users can create new comments.
     """
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['post']
 
     def perform_create(self, serializer):
         """
-        Set the owner of the comment to the logged-in user before saving.
+        Automatically set the logged-in user as the owner of the comment.
         """
         serializer.save(owner=self.request.user)
 
+
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve a comment by ID, or update or delete it if the user is the owner.
+    API view to retrieve, update, or delete a comment.
+
+    - Any user can retrieve a comment.
+    - Only the owner of the comment can update or delete it.
     """
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsCommentOwner]  # Apply permissions here
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsCommentOwner
+        ]
 
     def perform_update(self, serializer):
         """
-        Allow updating of a comment while keeping the owner unchanged.
+        Save updates to the comment without altering its owner.
         """
         serializer.save()
 
     def perform_destroy(self, instance):
         """
-        Perform the delete action on the comment instance.
+        Delete the comment instance.
         """
         instance.delete()
