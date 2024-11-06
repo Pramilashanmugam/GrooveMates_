@@ -65,7 +65,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '8000-pramilashan-groovemates-eommjup5mkz.ws.codeinstitute-ide.net',
-    'groovemates-backend.herokuapp.com',
+    'groovemates-backend-b16861eb6026.herokuapp.com',
     ]
 
 
