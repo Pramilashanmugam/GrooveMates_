@@ -61,11 +61,11 @@ REST_AUTH_SERIALIZERS = {
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'DEV' in os.environ
 
 ALLOWED_HOSTS = [
     '8000-pramilashan-groovemates-eommjup5mkz.ws.codeinstitute-ide.net',
-    'groovemates-backend-b16861eb6026.herokuapp.com',
+    os.environ.get('ALLOWED_HOST'),
     ]
 
 
