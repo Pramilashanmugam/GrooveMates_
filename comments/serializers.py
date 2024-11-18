@@ -29,31 +29,25 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         """
-        Fetch nested replies for a comment. Includes a limit to avoid deep
-        nesting.
-
-        Args:
-            obj (Comment): The parent comment instance.
-
-        Returns:
-            list: Serialized data for the replies of the comment.
+        Fetch nested replies for a comment, excluding the parent comment itself.
         """
-        if obj.replies.exists():
-            replies = obj.replies.all().order_by('-created_at')
-            return CommentSerializer(
-                replies, many=True, context=self.context).data
-        return []
+        # Explicitly filter replies to ensure only direct children are included
+        replies = obj.replies.filter(parent=obj).order_by('-created_at')
+        return CommentSerializer(replies, many=True, context=self.context).data
+
 
     def validate(self, data):
-        """
-        Validate that replies do not exceed one level of depth.
-        """
         parent = data.get('parent')
         if parent and parent.parent:
             raise serializers.ValidationError({
                 'parent': "Replies cannot be more than one level deep."
             })
+        if parent and parent == self.instance:  # Prevent self-reference
+            raise serializers.ValidationError({
+                'parent': "A comment cannot be a reply to itself."
+            })
         return data
+
 
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
