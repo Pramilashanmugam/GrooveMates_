@@ -3,12 +3,7 @@ from rest_framework import serializers
 from .models import Comment
 from profiles.models import Profile
 
-
 class CommentSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Comment model, with support for nested replies and
-    validation to restrict reply depth.
-    """
     owner = serializers.ReadOnlyField(source='owner.username')
     is_owner = serializers.SerializerMethodField()
     profile_id = serializers.ReadOnlyField(source='owner.profile.id')
@@ -29,14 +24,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         """
-        Fetch nested replies for a comment, excluding the parent comment itself.
+        Fetch direct replies for a comment, excluding the comment itself.
         """
-        # Explicitly filter replies to ensure only direct children are included
         replies = obj.replies.filter(parent=obj).order_by('-created_at')
         return CommentSerializer(replies, many=True, context=self.context).data
 
-
     def validate(self, data):
+        """
+        Prevent replies from nesting more than one level deep and self-referencing.
+        """
         parent = data.get('parent')
         if parent and parent.parent:
             raise serializers.ValidationError({
@@ -47,11 +43,6 @@ class CommentSerializer(serializers.ModelSerializer):
                 'parent': "A comment cannot be a reply to itself."
             })
         return data
-
-
-    def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
-        return super().create(validated_data)
 
     class Meta:
         model = Comment
