@@ -1,5 +1,4 @@
 from rest_framework import generics, permissions
-from rest_framework.exceptions import NotFound
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Comment
 from .serializers import CommentSerializer
@@ -15,14 +14,14 @@ class CommentList(generics.ListCreateAPIView):
     """
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Comment.objects.filter(parent=None).select_related('owner', 'post').prefetch_related('replies')
+    queryset = Comment.objects.filter(parent=None)  # Top-level comments only
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['post']
 
     def perform_create(self, serializer):
-        parent = serializer.validated_data.get('parent')
-        if parent and parent.parent:
-            raise serializers.ValidationError("Replies cannot be nested more than one level deep.")
+        """
+        Automatically set the logged-in user as the owner of the comment.
+        """
         serializer.save(owner=self.request.user)
 
 
@@ -46,6 +45,7 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
     def perform_destroy(self, instance):
-        if not instance:
-            raise NotFound(detail="Comment not found.")
+        """
+        Delete the comment instance.
+        """
         instance.delete()
