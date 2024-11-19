@@ -1,51 +1,30 @@
 from rest_framework import generics, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Comment
-from .serializers import CommentSerializer
+from .serializers import CommentSerializer, CommentDetailSerializer
 from .permissions import IsCommentOwner
 
 
 class CommentList(generics.ListCreateAPIView):
     """
-    API view to list all comments or create a new comment.
-
-    - Allows any user to view comments.
-    - Authenticated users can create new comments.
+    List comments or create a comment if logged in.
     """
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Comment.objects.filter(parent=None)  # Top-level comments only
+    queryset = Comment.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['post']
 
     def perform_create(self, serializer):
-        """
-        Automatically set the logged-in user as the owner of the comment.
-        """
         serializer.save(owner=self.request.user)
 
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    API view to retrieve, update, or delete a comment.
-
-    - Any user can retrieve a comment.
-    - Only the owner of the comment can update or delete it.
+    Retrieve a comment, or update or delete it by id if you own it.
     """
-    serializer_class = CommentSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+    serializer_class = CommentDetailSerializer
     queryset = Comment.objects.all()
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, IsCommentOwner
-        ]
 
-    def perform_update(self, serializer):
-        """
-        Save updates to the comment without altering its owner.
-        """
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        """
-        Delete the comment instance.
-        """
-        instance.delete()
+   

@@ -54,9 +54,9 @@ class CommentSerializer(serializers.ModelSerializer):
             bool: True if the logged-in user is the owner of the comment,
             False otherwise.
         """
-        request = self.context.get('request', None)
-        return request and request.user == obj.owner if request else False
-
+        request = self.context['request']
+        return request.user == obj.owner
+        
     def get_created_at(self, obj):
         """
         Get a human-readable representation of the comment's creation
@@ -120,3 +120,10 @@ class CommentSerializer(serializers.ModelSerializer):
             'updated_at',
             'likes_count',
             'dislikes_count']
+
+class CommentDetailSerializer(CommentSerializer):
+    """
+    Serializer for the Comment model used in Detail view
+    Post is a read only field so that we dont have to set it on each update
+    """
+    post = serializers.ReadOnlyField(source='post.id')
