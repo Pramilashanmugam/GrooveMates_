@@ -63,17 +63,19 @@ class PostSerializer(serializers.ModelSerializer):
     like_id = serializers.SerializerMethodField()
     date = serializers.DateField(format="%d %b %Y")
     time = serializers.TimeField(format="%H:%M")
+    likes_count = serializers.ReadOnlyField()
+    comments_count = serializers.ReadOnlyField()
 
     def validate_image(self, value):
-        if value.size > 1024 * 1024 * 2:
-            raise serializers.ValidationError('Image size is larger than 2MB')
-        if value.image.width > 4096:
-            raise serializers.ValidationError(
-                'Image width is larger than 4096px'
-            )
+        if value.size > 2 * 1024 * 1024:
+            raise serializers.ValidationError('Image size larger than 2MB!')
         if value.image.height > 4096:
             raise serializers.ValidationError(
-                'Image height is larger than 4096px'
+                'Image height larger than 4096px!'
+            )
+        if value.image.width > 4096:
+            raise serializers.ValidationError(
+                'Image width larger than 4096px!'
             )
         return value
 
@@ -111,11 +113,10 @@ class PostSerializer(serializers.ModelSerializer):
     def get_like_id(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            like_id = Like.objects.filter(
-                owner=user,
-                post=obj
-            ).values_list('id', flat=True).first()
-            return like_id
+            like = Like.objects.filter(
+                owner=user, post=obj
+            ).first()
+            return like.id if like else None
         return None
 
     class Meta:
