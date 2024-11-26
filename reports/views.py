@@ -3,19 +3,20 @@ from .models import Report
 from .serializers import ReportSerializer
 from drf_api.permissions import IsAdminOrCreateOnly
 
-class ReportCreateView(generics.CreateAPIView):
+class ReportCreateView(generics.ListCreateAPIView):
     """
-    View for creating a new report.
+    View for creating a new report and listing reports.
     """
     serializer_class = ReportSerializer
     permission_classes = [IsAdminOrCreateOnly]
+    queryset = Report.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(reporter=self.request.user)
 
-class ReportListView(generics.ListAPIView):
+class ReportListView(generics.RetrieveUpdateDestroyAPIView):
     """
-    View for admins to list all reports.
+    View for retrieving, updating, or deleting a specific report.
     """
     serializer_class = ReportSerializer
     permission_classes = [IsAdminOrCreateOnly]
