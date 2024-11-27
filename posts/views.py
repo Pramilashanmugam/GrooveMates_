@@ -16,7 +16,7 @@ class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.annotate(
         likes_count=Count('likes', distinct=True),
         comments_count=Count('comment', distinct=True),
-        share_count=Count('shared_posts', distinct=True)
+        share_count=Count('share_posts', distinct=True)
     ).order_by('-created_at')
     filter_backends = [
         filters.OrderingFilter,
@@ -53,5 +53,5 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.annotate(
         likes_count=Count('likes', distinct=True),
         comments_count=Count('comment', distinct=True),
-        share_count=Count('shared_posts', distinct=True)
+        share_count=Count('share_posts', distinct=True)
     ).order_by('-created_at')
