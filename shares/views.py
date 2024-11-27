@@ -1,7 +1,9 @@
 from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
-from .models import Share
-from .serializers import ShareSerializer
+from posts.models import Post
+from posts.serializers import PostSerializer
+from shares.models import Share
+from shares.serializers import ShareSerializer
 from drf_api.permissions import IsOwnerOrReadOnly
 
 class ShareList(generics.ListCreateAPIView):
@@ -18,6 +20,11 @@ class ShareList(generics.ListCreateAPIView):
         
         serializer.save(user=user)
 
+        # Increment the share_count for the post
+        post.share_count += 1
+        post.save()
+
+        return share
 
 class ShareDetail(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -29,3 +36,16 @@ class ShareDetail(generics.RetrieveDestroyAPIView):
         if share.user != request.user:
             raise ValidationError("You are not allowed to delete this share.")
         return super().delete(request, *args, **kwargs)
+
+class UserSharedPostsView(generics.ListAPIView):
+    """
+    List all posts shared by a specific user.
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Post.objects.none()
+        return Post.objects.filter(share_posts__user=user).distinct()
