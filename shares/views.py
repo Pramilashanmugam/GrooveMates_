@@ -2,6 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
 from .models import Share
 from .serializers import ShareSerializer
+from drf_api.permissions import IsOwnerOrReadOnly
 
 class ShareList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
