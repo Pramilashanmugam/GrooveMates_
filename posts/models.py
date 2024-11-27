@@ -65,7 +65,9 @@ class Post(models.Model):
     image_filter = models.CharField(
         max_length=32, choices=image_filter_choices, default='normal'
     )
-
+    share_posts = models.ManyToManyField(
+        User, through='shares.Share', related_name='post_share'
+    )
     class Meta:
         ordering = ['-created_at']
 
