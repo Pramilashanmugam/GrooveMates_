@@ -15,4 +15,4 @@ class Share(models.Model):
         unique_together = ['user', 'post']  # Ensure user can share a post only once
 
     def __str__(self):
-        return f"{self.user.username} shared '{self.post.title}'"
+        return f"{self.user.username} shared '{self.post.event}'"
