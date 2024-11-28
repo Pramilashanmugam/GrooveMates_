@@ -20,10 +20,6 @@ class ShareList(generics.ListCreateAPIView):
         
         serializer.save(user=user)
 
-        # Increment the share_count for the post
-        post.share_count += 1
-        post.save()
-
         return share
 
 class ShareDetail(generics.RetrieveDestroyAPIView):
