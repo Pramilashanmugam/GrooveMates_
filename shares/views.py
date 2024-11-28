@@ -44,4 +44,4 @@ class UserSharedPostsView(generics.ListAPIView):
         user = self.request.user
         if not user.is_authenticated:
             return Post.objects.none()
-        return Post.objects.filter(share_posts__user=user).distinct()
+        return Post.objects.filter(shared_posts__user=user).distinct()
