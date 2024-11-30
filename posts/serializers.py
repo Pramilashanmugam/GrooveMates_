@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from shares.models import Share
 from posts.models import Post
 from likes.models import Like
 from datetime import datetime, timedelta
@@ -66,6 +67,7 @@ class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.ReadOnlyField()
     comments_count = serializers.ReadOnlyField()
     share_count = serializers.ReadOnlyField()
+    shared_by = serializers.SerializerMethodField()
 
     def validate_image(self, value):
         if value.size > 2 * 1024 * 1024:
@@ -119,6 +121,13 @@ class PostSerializer(serializers.ModelSerializer):
             ).first()
             return like.id if like else None
         return None
+    
+    def get_shared_by(self, obj):
+        # Get the user who shared this post
+        share = Share.objects.filter(post=obj).first()
+        if share:
+            return share.user.username
+        return None
 
     class Meta:
         model = Post
@@ -126,5 +135,5 @@ class PostSerializer(serializers.ModelSerializer):
             'id', 'owner', 'created_at', 'updated_at', 'event',
             'description', 'image', 'location', 'date', 'time', 'is_owner',
             'profile_id', 'profile_image', 'image_filter', 'like_id',
-            'likes_count', 'comments_count', 'share_count',
+            'likes_count', 'comments_count', 'share_count','shared_by'
         ]
