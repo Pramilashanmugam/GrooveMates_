@@ -68,6 +68,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments_count = serializers.ReadOnlyField()
     share_count = serializers.ReadOnlyField()
     shared_by = serializers.SerializerMethodField()
+    is_shared_by_user = serializers.SerializerMethodField()
 
     def validate_image(self, value):
         if value.size > 2 * 1024 * 1024:
@@ -128,6 +129,10 @@ class PostSerializer(serializers.ModelSerializer):
         if share:
             return share.user.username
         return None
+    
+    def get_is_shared_by_user(self, obj):
+        user = self.context['request'].user
+        return Share.objects.filter(user=user, post=obj).exists()
 
     class Meta:
         model = Post
@@ -135,5 +140,5 @@ class PostSerializer(serializers.ModelSerializer):
             'id', 'owner', 'created_at', 'updated_at', 'event',
             'description', 'image', 'location', 'date', 'time', 'is_owner',
             'profile_id', 'profile_image', 'image_filter', 'like_id',
-            'likes_count', 'comments_count', 'share_count','shared_by'
+            'likes_count', 'comments_count', 'share_count','shared_by', 'is_shared_by_user'
         ]
