@@ -7,54 +7,66 @@ from datetime import datetime, timedelta
 
 class PostSerializer(serializers.ModelSerializer):
     """
-    Serializer for the Post model.
+    Serializer for the Post model, converting Post instances to and from JSON
+    format for API interactions.
 
-    This serializer converts Post instances into JSON format and vice versa,
-    making it suitable for API views. It includes fields for user-related
-    data and validations to ensure data integrity.
+    This serializer includes user-related fields, validations, and computed
+    fields to enhance API responses with detailed information about posts
+    and user interactions.
 
     Fields:
-    - `id`: The primary key of the post.
-    - `owner`: Read-only field that displays the username of the post owner.
-    - `created_at`: Timestamp of when the post was created.
-    - `updated_at`: Timestamp of the last update made to the post.
-    - `event`: The name of the event associated with the post.
-    - `description`: The description of the post, which can be left blank.
-    - `image`: The image associated with the post, uploaded to a specified
-    path.
-    - `location`: The location where the event takes place.
-    - `date`: The date of the event, validated to ensure it is not in the past
-      or more than 10 years in the future.
-    - `time`: The time of the event, validated to ensure it is not in the past
-      for today's date.
-    - `is_owner`: A boolean field indicating whether the currently
-    authenticated user is the owner of the post.
-    - `profile_id`: Read-only field showing the ID of the owner's profile.
-    - `profile_image`: Read-only field showing the URL of the owner's profile
-    image.
-    - `like_id`: The ID of the Like object if the authenticated user liked the
-      post; otherwise, None.
+        - `id`: Primary key of the post.
+        - `owner`: Read-only field showing the username of the post owner.
+        - `created_at`: Timestamp indicating when the post was created.
+        - `updated_at`: Timestamp indicating the last update to the post.
+        - `event`: The name of the event associated with the post.
+        - `description`: Optional description of the post.
+        - `image`: Image associated with the post, with validation for size
+        and dimensions.
+        - `location`: Location of the event.
+        - `date`: Event date, validated to ensure it is not in the past or
+        more than 10 years in the future.
+        - `time`: Event time, validated to ensure it is not in the past for
+        today's date.
+        - `is_owner`: Boolean indicating if the authenticated user owns the
+        post.
+        - `profile_id`: Read-only field for the profile ID of the post owner.
+        - `profile_image`: Read-only field for the profile image URL of the
+        post owner.
+        - `image_filter`: Filter applied to the post's image.
+        - `like_id`: ID of the Like object if the authenticated user has liked
+        the post; otherwise, None.
+        - `likes_count`: Total count of likes on the post.
+        - `comments_count`: Total count of comments on the post.
+        - `share_count`: Total count of shares of the post.
+        - `shared_by`: Username of the user who shared the post, if applicable.
+        - `is_shared_by_user`: Boolean indicating if the authenticated user
+        has shared the post.
 
     Methods:
-    - `validate_image`: Validates the image size and dimensions to ensure they
-      meet specified criteria (max size of 2MB and max dimensions of
-      4096x4096).
-    - `validate_date`: Validates the date to ensure it is not in the past or
-      more than 10 years in the future.
-    - `validate_time`: Validates the time to ensure it is not in the past
-      for the current date.
-    - `get_is_owner`: Checks if the authenticated user is the owner of the
-      post and returns a boolean value.
-    - `get_like_id`: Retrieves the ID of the Like object associated with the
-      authenticated user if they liked the post; otherwise, returns None.
+        - `validate_image(value)`: Ensures the image is below 2MB and within
+        4096x4096 dimensions.
+        - `validate_date(value)`: Ensures the date is valid and within allowed
+        bounds (not in the past or more than 10 years in the future).
+        - `validate_time(value)`: Ensures the time is not in the past for
+        today's date.
+        - `get_is_owner(obj)`: Determines if the authenticated user owns the
+        post.
+        - `get_like_id(obj)`: Retrieves the Like ID for the authenticated user,
+        if they liked the post.
+        - `get_shared_by(obj)`: Retrieves the username of the user who shared
+        the post.
+        - `get_is_shared_by_user(obj)`: Checks if the authenticated user has
+        shared the post.
 
     Meta:
-    - `model`: The Post model.
-    - `fields`: Specifies which fields to include in the serialized output.
+        - `model`: The Post model.
+        - `fields`: Specifies all included fields for serialization.
 
-    Example Usage:
-    - Serializing a Post instance will yield a dictionary containing all
-      specified fields, ready to be returned in an API response.
+    Usage:
+        - Serialize Post instances to JSON for API responses.
+        - Validate and deserialize JSON data into Post instances for creating
+        or updating posts.
     """
 
     owner = serializers.ReadOnlyField(source='owner.username')
@@ -122,17 +134,21 @@ class PostSerializer(serializers.ModelSerializer):
             ).first()
             return like.id if like else None
         return None
-    
+
     def get_shared_by(self, obj):
         # Get the user who shared this post
         share = Share.objects.filter(post=obj).first()
         if share:
             return share.user.username
         return None
-    
+
     def get_is_shared_by_user(self, obj):
         user = self.context['request'].user
+        # Check if the user is authenticated
+        if not user.is_authenticated:
+            return False  # Return False for unauthenticated users
         return Share.objects.filter(user=user, post=obj).exists()
+
 
     class Meta:
         model = Post
@@ -140,5 +156,6 @@ class PostSerializer(serializers.ModelSerializer):
             'id', 'owner', 'created_at', 'updated_at', 'event',
             'description', 'image', 'location', 'date', 'time', 'is_owner',
             'profile_id', 'profile_image', 'image_filter', 'like_id',
-            'likes_count', 'comments_count', 'share_count','shared_by', 'is_shared_by_user'
+            'likes_count', 'comments_count', 'share_count', 'shared_by',
+            'is_shared_by_user'
         ]

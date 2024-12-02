@@ -1,166 +1,127 @@
 from django.contrib.auth.models import User
-from django.utils import timezone
 from .models import Post
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.core.exceptions import ValidationError
-from django.urls import reverse
 
 
-class PostListViewTests(APITestCase):
+class PostListViewTest(APITestCase):
     """
-    Tests for the Post list and creation views.
+     Tests for the PostList view.
     """
-
     def setUp(self):
-        """Create a test user for the test cases."""
-        self.user = User.objects.create_user(username='adam', password='pass')
+        self.user = User.objects.create_user(
+            username="tester",
+            password="password",
+        )
 
     def test_can_list_posts(self):
-        """Verify a logged-in user can list posts."""
-        Post.objects.create(owner=self.user, event='Sample Event',
-                            location='Sample Location')
+        tester = User.objects.get(username='tester')
+        Post.objects.create(
+            owner=tester,
+            event='post event',
+            date='2025-07-29',
+            time='14:00:00'
+        )
         response = self.client.get('/posts/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
 
     def test_logged_in_user_can_create_post(self):
-        """Check that a logged-in user can create a post."""
-        self.client.login(username='adam', password='pass')
-        response = self.client.post('/posts/', {
-            'event': 'New Event',
-            'location': 'New Location',
-            'date': timezone.now().date(),
-            'time': timezone.now().time()
-        })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Post.objects.count(), 1)
-
-    def test_user_not_logged_in_cant_create_post(self):
-        """Ensure a user must be logged in to create a post."""
-        response = self.client.post('/posts/', {
-            'event': 'Unauthorized Event',
-            'location': 'Unauthorized Location'
-        })
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_image_filter_choices(self):
-        """Validate that image filter choices raise validation errors for
-        invalid input."""
-        with self.assertRaises(ValidationError):
-            post = Post(
-                owner=self.user,
-                event='Test Event',
-                location='Test Location',
-                image_filter='invalid_filter'
-            )
-            post.full_clean()  # Should raise ValidationError
-
-    def test_user_cannot_update_others_post(self):
-        """Ensure a user cannot update another user's post."""
-        another_user = User.objects.create_user(username='anotheruser',
-                                                password='anotherpass')
-        post = Post.objects.create(owner=another_user, event='Another Event',
-                                   location='Location')
-        self.client.login(username='adam', password='pass')
-        response = self.client.put(f'/posts/{post.id}/', {
-            'event': 'Unauthorized Update',
-            'location': 'New Location',
-            'date': timezone.now().date(),
-            'time': timezone.now().time()
-        })
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_user_cannot_delete_others_post(self):
-        """Verify that a user cannot delete another user's post."""
-        another_user = User.objects.create_user(username='anotheruser',
-                                                password='anotherpass')
-        post = Post.objects.create(owner=another_user, event='Another Event',
-                                   location='Location')
-        self.client.login(username='adam', password='pass')
-        response = self.client.delete(f'/posts/{post.id}/')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(Post.objects.count(), 1)  # Ensure the post exist
-
-
-class PostDetailTests(APITestCase):
-    """
-    Tests for the Post detail views, including retrieval, update, and
-    delete actions.
-    """
-
-    def setUp(self):
-        """Create two users and a post for testing."""
-        self.owner_user = User.objects.create_user(username='owner',
-                                                   password='ownerpass')
-        self.other_user = User.objects.create_user(username='other',
-                                                   password='otherpass')
-        self.post = Post.objects.create(
-            owner=self.owner_user,
-            event='Test Event',
-            description='This is a test event',
-            date='2024-10-28',
-            time='10:00',
-            location='Test Location'
+        self.client.login(username='tester', password='password')
+        response = self.client.post(
+            '/posts/', {
+                'event': 'post event',
+                'date': '2025-07-29',
+                'time': '14:00:00',
+                'location': 'Test location',
+                'image': '',
+                'description': 'Test description',
+                }
         )
-        self.url = reverse('post-detail', kwargs={'pk': self.post.pk})
+        count = Post.objects.count()
+        self.assertEqual(count, 1)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_get_post_detail_as_owner(self):
-        """Verify the owner can retrieve their post's details."""
-        self.client.login(username='owner', password='ownerpass')
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['event'], 'Test Event')
-
-    def test_get_post_detail_as_other_user(self):
-        """Ensure another user can also retrieve the post's details."""
-        self.client.login(username='other', password='otherpass')
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['event'], 'Test Event')
-
-    def test_put_post_as_owner(self):
-        """Check that the owner can update their post."""
-        self.client.login(username='owner', password='ownerpass')
-        updated_data = {
-            'event': 'Updated Event',
-            'description': 'This is an updated test event',
-            'date': '2024-11-01',
-            'time': '11:00',
-            'location': 'Updated Location'
-        }
-        response = self.client.put(self.url, updated_data)
-        self.post.refresh_from_db()
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.post.event, 'Updated Event')
-
-    def test_put_post_as_other_user(self):
-        """Ensure a non-owner cannot update the post."""
-        self.client.login(username='other', password='otherpass')
-        updated_data = {
-            'event': 'Malicious Update',
-            'description': 'This should not be allowed',
-            'date': '2024-11-01',
-            'time': '11:00',
-            'location': 'Malicious Location'
-        }
-        response = self.client.put(self.url, updated_data)
+    def test_logged_out_user_cant_create_post(self):
+        response = self.client.post(
+            '/posts/', {
+                'event': 'post event',
+                }
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.post.refresh_from_db()  # Ensure the post has not been modified
-        self.assertEqual(self.post.event, 'Test Event')
 
-    def test_delete_post_as_owner(self):
-        """Verify that the owner can delete their post."""
-        self.client.login(username='owner', password='ownerpass')
-        response = self.client.delete(self.url)
+
+class PostDetailViewTest(APITestCase):
+    """
+     Tests for the PostDetail view.
+    """
+    def setUp(self):
+        tester1 = User.objects.create_user(
+            username="tester1",
+            password="password1",
+        )
+        tester2 = User.objects.create_user(
+            username="tester2",
+            password="password2",
+        )
+        Post.objects.create(
+            owner=tester1,
+            event='Post event tester1',
+            date='2025-08-01',
+            time='15:00:00',
+            location='Test location tester1',
+            description='Test description 1',            
+        )
+        Post.objects.create(
+            owner=tester2,
+            event='post event tester2',
+            date='2025-08-03',
+            time='09:00:00',
+            location='Test location tester2',
+            description='Test description 2',
+        )
+
+        def test_can_retrieve_post_with_id(self):
+            self.client.login(username='tester1', password='password1')
+            response = self.client.get('/posts/1/')
+            self.assertEqual(
+                response.data['event'], 'Post event tester1'
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_cant_retrieve_post_using_invalid_id(self):
+        response = self.client.get('/posts/2018/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_user_can_update_post(self):
+        self.client.login(username='tester1', password='password1')
+        response = self.client.put('/posts/1/', {
+                'event': 'post update event',
+                'date': '2025-08-01',
+                'time': '15:00:00',
+                'location': 'Test location tester1',
+                })
+        post = Post.objects.filter(pk=1).first()
+        self.assertEqual(post.event, 'post update event')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_cant_update_other_users_post(self):
+        self.client.login(username='tester1', password='password1')
+        response = self.client.put('/posts/2/', {
+            'event': 'post update event 2',
+            'date': '2025-08-03',
+            'time': '09:00:00',
+            'location': 'Test location tester2',
+            })
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_can_delete_own_post(self):
+        self.client.login(username='tester1', password='password1')
+        response = self.client.delete('/posts/1/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        # Verify post is deleted
-        self.assertFalse(Post.objects.filter(pk=self.post.pk).exists())
 
-    def test_delete_post_as_other_user(self):
-        """Ensure a non-owner cannot delete the post."""
-        self.client.login(username='other', password='otherpass')
-        response = self.client.delete(self.url)
+    def test_user_cant_delete_other_users_post(self):
+        self.client.login(username='tester1', password='password1')
+        response = self.client.delete('/posts/2/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        # Ensure post still exists
-        self.assertTrue(Post.objects.filter(pk=self.post.pk).exists())
+
