@@ -63,7 +63,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'DEV' in os.environ
-#DEBUG = True
 
 ALLOWED_HOSTS = [
     '8000-pramilashan-groovemates-eommjup5mkz.ws.codeinstitute-ide.net',
@@ -91,7 +90,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',   # For token-based authentication
     'dj_rest_auth',               # dj-rest-auth for auth endpoints
     'allauth',                    # django-allauth for account management
-    'allauth.account',            # Account management (username, email, password management)
+    'allauth.account',            # Account management
     'dj_rest_auth.registration',
     'corsheaders',
 
@@ -115,11 +114,12 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 if 'CLIENT_ORIGIN_DEV' in os.environ:
-    extracted_url = re.match(r'^.+-', os.environ.get('CLIENT_ORIGIN_DEV', ''), re.IGNORECASE).group(0)
+    extracted_url = re.match(
+        r'^.+-', os.environ.get('CLIENT_ORIGIN_DEV', ''), re.IGNORECASE).group(0)
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^https://.*\.codeinstitute-ide\.net$",
     ]

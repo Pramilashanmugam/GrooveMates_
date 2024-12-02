@@ -1,5 +1,5 @@
-# permissions.py
 from rest_framework import permissions
+
 
 class IsCommentOwner(permissions.BasePermission):
     """
@@ -10,4 +10,5 @@ class IsCommentOwner(permissions.BasePermission):
         # Check if the request is a DELETE or PUT/PATCH request
         if request.method in permissions.SAFE_METHODS:
             return True  # Allow GET requests for everyone
-        return obj.owner == request.user  # Only allow the owner to delete or update
+        # Only allow the owner to delete or update
+        return obj.owner == request.user

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Comment
 from profiles.models import Profile
 
+
 class CommentSerializer(serializers.ModelSerializer):
     """
     Serializer for Comment model.
@@ -56,7 +57,7 @@ class CommentSerializer(serializers.ModelSerializer):
         """
         request = self.context['request']
         return request.user == obj.owner
-        
+
     def get_created_at(self, obj):
         """
         Get a human-readable representation of the comment's creation
@@ -120,6 +121,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'updated_at',
             'likes_count',
             'dislikes_count']
+
 
 class CommentDetailSerializer(CommentSerializer):
     """
