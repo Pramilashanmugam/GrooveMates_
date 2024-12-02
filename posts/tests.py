@@ -15,13 +15,7 @@ class PostListViewTest(APITestCase):
         )
 
     def test_can_list_posts(self):
-        tester = User.objects.get(username='tester')
-        Post.objects.create(
-            owner=tester,
-            event='post event',
-            date='2025-07-29',
-            time='14:00:00'
-        )
+        self.client.login(username='tester', password='password')
         response = self.client.get('/posts/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -69,25 +63,24 @@ class PostDetailViewTest(APITestCase):
             date='2025-08-01',
             time='15:00:00',
             location='Test location tester1',
-            description='Test description 1',            
+            description='Test description 1',
         )
         Post.objects.create(
             owner=tester2,
-            event='post event tester2',
+            event='Post event tester2',
             date='2025-08-03',
             time='09:00:00',
             location='Test location tester2',
             description='Test description 2',
         )
 
-        def test_can_retrieve_post_with_id(self):
-            self.client.login(username='tester1', password='password1')
-            response = self.client.get('/posts/1/')
-            self.assertEqual(
-                response.data['event'], 'Post event tester1'
-            )
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+    def test_can_retrieve_post_with_id(self):
+        self.client.login(username='tester1', password='password1')
+        response = self.client.get('/posts/1/')
+        self.assertEqual(
+            response.data['event'], 'Post event tester1'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_cant_retrieve_post_using_invalid_id(self):
         response = self.client.get('/posts/2018/')
@@ -124,4 +117,3 @@ class PostDetailViewTest(APITestCase):
         self.client.login(username='tester1', password='password1')
         response = self.client.delete('/posts/2/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
