@@ -144,7 +144,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_is_shared_by_user(self, obj):
         user = self.context['request'].user
-        return Share.objects.filter(user=user, post=obj).exists()
+        # Check if the user is authenticated
+        if user.is_authenticated:
+            return Share.objects.filter(user=user, post=obj).exists()
+        return False  # Return False if the user is not authenticated
 
     class Meta:
         model = Post
