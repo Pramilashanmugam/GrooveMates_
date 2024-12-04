@@ -119,5 +119,10 @@ class UserSharedPostsView(generics.ListAPIView):
             return Post.objects.none()
 
         # Retrieve all posts shared by the authenticated user
-        return Post.objects.filter(shared_posts__user=user).distinct()
+        shared_posts = Post.objects.filter(shared_posts__user=user).distinct()
+
+        # Filter the posts to match the logged-in user’s profile (shared_by)
+        # assuming that `shared_by` is the username field in the Share model
+        return shared_posts.filter(shared_posts__user__username=user.username)
+
 
