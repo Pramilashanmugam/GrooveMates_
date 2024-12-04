@@ -106,13 +106,10 @@ class PostSerializer(serializers.ModelSerializer):
         return None
 
     def get_shared_by(self, obj):
-        """
-        Retrieves a list of usernames of the users who have shared the post.
-        Returns an empty list if no user has shared it.
-        """
         shares = Share.objects.filter(post=obj)
-        shared_users = [share.user.username for share in shares]  # List of all users who shared
-        return shared_users if shared_users else None
+        shared_users = [share.user.username for share in shares]
+        return shared_users if shared_users else []  # Return an empty list instead of None
+
 
 
     def get_is_shared_by_user(self, obj):
