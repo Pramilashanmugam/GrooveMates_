@@ -2,6 +2,7 @@ from django.db import IntegrityError
 from rest_framework import serializers
 from shares.models import Share
 from posts.models import Post
+from posts.serializers import PostSerializer
 
 
 class ShareSerializer(serializers.ModelSerializer):
@@ -19,6 +20,8 @@ class ShareSerializer(serializers.ModelSerializer):
     """
     # Ensures the user field is read-only
     user = serializers.ReadOnlyField(source='user.username')
+    post = PostSerializer(read_only=True)  # Use nested PostSerializer to show post details
+
 
     class Meta:
         model = Share
