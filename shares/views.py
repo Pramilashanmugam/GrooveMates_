@@ -94,35 +94,24 @@ class ShareDetail(generics.RetrieveDestroyAPIView):
 
 class UserSharedPostsView(generics.ListAPIView):
     """
-    List posts shared by the currently authenticated user.
+    List posts shared by the user whose shared_by matches the logged-in user.
 
     Methods:
-        - `GET`: Retrieves a list of posts shared by the authenticated user.
-
-    Permissions:
-        - Authenticated users can view their own shared posts.
+        - `GET`: Retrieves a list of posts shared by the logged-in user.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
     serializer_class = PostSerializer
 
     def get_queryset(self):
         """
-        Retrieve posts that have been shared by the authenticated user.
-
-        Returns:
-            QuerySet: A queryset of posts shared by the authenticated user.
+        Filters posts based on the shared_by username, matching the current logged-in user.
         """
-        user = self.request.user
-        
+        user = self.request.user  # Get the logged-in user
+
         if not user.is_authenticated:
-            # Return an empty queryset for unauthenticated users
-            return Post.objects.none()
+            return Post.objects.none()  # Return an empty queryset if not authenticated
 
-        # Retrieve all posts shared by the authenticated user
-        shared_posts = Post.objects.filter(shared_posts__user=user).distinct()
-
-        # Filter the posts to match the logged-in user’s profile (shared_by)
-        # assuming that `shared_by` is the username field in the Share model
-        return shared_posts.filter(shared_posts__user__username=user.username)
+        # Filter posts where the shared_by user matches the logged-in user's username
+        return Post.objects.filter(shared_posts__user=user).distinct()
 
 
