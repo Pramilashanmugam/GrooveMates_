@@ -94,54 +94,30 @@ class ShareDetail(generics.RetrieveDestroyAPIView):
 
 class UserSharedPostsView(generics.ListAPIView):
     """
-    List posts shared by the authenticated user or by a specific profile.
+    List posts shared by the currently authenticated user.
 
     Methods:
-        - `GET`: Retrieves a list of posts shared by the authenticated user or
-                 by a specific profile ID (if provided in query params).
-
-    Query Parameters:
-        - `profile_id` (optional): Filters shared posts by the specified
-                                   profile's ID.
+        - `GET`: Retrieves a list of posts shared by the authenticated user.
 
     Permissions:
-        - Authenticated users can view shared posts.
-
-    Returns:
-        A queryset of posts shared by the specified profile or the
-        authenticated user.
+        - Authenticated users can view their own shared posts.
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = PostSerializer
 
     def get_queryset(self):
         """
-        Filter posts based on the authenticated user or a specific profile ID.
-
-        If a profile ID is provided in the query parameters, retrieves posts
-        shared by the user associated with that profile. Otherwise, retrieves
-        posts shared by the authenticated user.
+        Retrieve posts that have been shared by the authenticated user.
 
         Returns:
-            QuerySet: A queryset of shared posts.
-
-        Raises:
-            None: Returns an empty queryset if the user is unauthenticated.
+            QuerySet: A queryset of posts shared by the authenticated user.
         """
-        profile_id = self.request.query_params.get("profile_id")
-        user = None
-
-        if profile_id:
-            # Attempt to retrieve the user associated with the given profile ID
-            user = User.objects.filter(profile__id=profile_id).first()
-
-        if not user:
-            # Default to the logged-in user if no profile ID is provided
-            user = self.request.user
-
+        user = self.request.user
+        
         if not user.is_authenticated:
             # Return an empty queryset for unauthenticated users
             return Post.objects.none()
 
-        # Retrieve and return posts shared by the specified user
+        # Retrieve all posts shared by the authenticated user
         return Post.objects.filter(shared_posts__user=user).distinct()
+
