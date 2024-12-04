@@ -8,8 +8,9 @@ from .serializers import PostSerializer
 
 class PostList(generics.ListCreateAPIView):
     """
-    List posts or create a post if logged in.
-    The perform_create method associates the post with the logged in user.
+    API view to list all posts or create a new post.
+    - List all posts, with filtering, searching, and ordering options.
+    - Authenticated users can create posts.
     """
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -24,29 +25,34 @@ class PostList(generics.ListCreateAPIView):
         DjangoFilterBackend,
     ]
     filterset_fields = [
+        # Filter posts by followers of the owner
         'owner__followed__owner__profile',
-        'likes__owner__profile',
-        'owner__profile',
+        'likes__owner__profile',  # Filter posts by users who liked them
+        'owner__profile',  # Filter posts by the owner's profile
     ]
     search_fields = [
-        'owner__username',
-        'event',
-        'date',
+        'owner__username',  # Search by the username of the owner
+        'event',  # Search by the event field in the post
+        'date',  # Search by the date field in the post
     ]
     ordering_fields = [
-        'likes_count',
-        'comments_count',
-        'share_count',
-        'likes__created_at',
+        'likes_count',  # Order by the number of likes
+        'comments_count',  # Order by the number of comments
+        'share_count',  # Order by the number of shares
+        'likes__created_at',  # Order by the creation date of likes
     ]
 
     def perform_create(self, serializer):
+        """
+        Override perform_create to associate the post with the logged-in user.
+        """
         serializer.save(owner=self.request.user)
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve a post and edit or delete it if you own it.
+    API view to retrieve, update, or delete a single post.
+    - Only the owner of the post can edit or delete it.
     """
     serializer_class = PostSerializer
     permission_classes = [IsOwnerOrReadOnly]
