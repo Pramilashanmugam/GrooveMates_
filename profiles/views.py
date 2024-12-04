@@ -8,8 +8,26 @@ from .serializers import ProfileSerializer
 
 class ProfileList(generics.ListAPIView):
     """
-    List all profiles.
-    No create view as profile creation is handled by django signals.
+    API view to list all profiles.
+
+    - Profiles are annotated with additional fields:
+        - `posts_count`: The number of posts created by the profile owner.
+        - `followers_count`: The number of users following the profile owner.
+        - `following_count`: The number of users the profile owner is following
+    - Profiles are ordered by their creation date (descending) by default.
+
+    Filtering and ordering:
+    - Filters:
+        - Profiles followed by the current user:
+        `owner__following__followed__profile`.
+        - Profiles following the current user:
+        `owner__followed__owner__profile`.
+    - Ordering fields:
+        - `posts_count`: Total posts by the profile owner.
+        - `followers_count`: Total followers of the profile owner.
+        - `following_count`: Total users the profile owner follows.
+        - `owner__following__created_at`: Date of following activity.
+        - `owner__followed__created_at`: Date of follower activity.
     """
     queryset = Profile.objects.annotate(
         posts_count=Count('owner__post', distinct=True),
@@ -17,12 +35,16 @@ class ProfileList(generics.ListAPIView):
         following_count=Count('owner__following', distinct=True),
     ).order_by('-created_at')
     serializer_class = ProfileSerializer
+
+    # Add support for filtering and ordering
     filter_backends = [
-        filters.OrderingFilter,
-        DjangoFilterBackend,
+        filters.OrderingFilter,  # Enable ordering by specified fields
+        DjangoFilterBackend,    # Enable filtering using DjangoFilterBackend
     ]
     filterset_fields = [
-        'owner__following__followed__profile', 
+        # Filter profiles followed by the current user
+        'owner__following__followed__profile',
+        # Filter profiles following the current user
         'owner__followed__owner__profile',
     ]
     ordering_fields = [
@@ -36,12 +58,24 @@ class ProfileList(generics.ListAPIView):
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):
     """
-    Retrieve or update a profile if you're the owner.
+    API view to retrieve or update a single profile.
+
+    - Only the owner of the profile can update it.
+    - The profile includes annotations for additional fields:
+        - `posts_count`: The number of posts created by the profile owner.
+        - `followers_count`: The number of users following the profile owner.
+        - `following_count`: The number of users the profile owner is following
+    - Profiles are ordered by their creation date (descending) by default.
+
+    Permissions:
+    - Read-only access is allowed for all users.
+    - Update access is restricted to the owner of the profile.
     """
+    # Custom permission to restrict updates to the owner
     permission_classes = [IsOwnerOrReadOnly]
     queryset = Profile.objects.annotate(
         posts_count=Count('owner__post', distinct=True),
         followers_count=Count('owner__followed', distinct=True),
         following_count=Count('owner__following', distinct=True),
-    ).order_by('-created_at')
+    ).order_by('-created_at')  # Default ordering by creation date
     serializer_class = ProfileSerializer
