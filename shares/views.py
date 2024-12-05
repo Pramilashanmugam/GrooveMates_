@@ -94,12 +94,16 @@ class ShareDetail(generics.RetrieveDestroyAPIView):
 
 class UserSharedPostsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = ShareSerializer
+    serializer_class = PostSerializer
 
     def get_queryset(self):
-        # Fetch all shared posts
-        shared_posts = Share.objects.all()
-        return shared_posts  # Return the Share objects, not the Post objects
+        """
+        Fetch all the posts that have been shared.
+        Return the Post objects that are associated with the shares.
+        """
+        # Fetch distinct posts that have been shared
+        shared_posts = Post.objects.filter(shared_posts__isnull=False).distinct()
+        return shared_posts  # Return distinct Post objects that have been shared
 
 
 
