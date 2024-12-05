@@ -20,7 +20,7 @@ class ShareSerializer(serializers.ModelSerializer):
     """
     # Ensures the user field is read-only
     user = serializers.ReadOnlyField(source='user.username')
-    post = PostSerializer()  # Use nested PostSerializer to show post details
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
 
 
     class Meta:
