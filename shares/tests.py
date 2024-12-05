@@ -20,7 +20,7 @@ class ShareTests(TestCase):
         - Creating two posts, each owned by one of the users
         - Authenticating the first user for subsequent tests
         - Creating an initial share object for testing listing and duplicate
-        prevention
+          prevention
         """
         self.client = APIClient()
 
@@ -95,9 +95,9 @@ class ShareTests(TestCase):
         - The response status is 200 OK
         - The number of posts returned matches the expected count
         - The returned post matches the one shared by the user associated with
-        the profile
+          the profile
         """
-        profile_id = self.user1.profile.id
+        profile_id = self.user1.profile.id  # Ensure profile_id exists
         response = self.client.get(f'/shared-posts/?profile_id={profile_id}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
@@ -111,7 +111,28 @@ class ShareTests(TestCase):
         - The response status is 403 FORBIDDEN
         - The share is not created in the database
         """
-        self.client.logout()
+        self.client.logout()  # Logout user1
         data = {"post": self.post1.id}
         response = self.client.post('/shares/', data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_share_with_invalid_post_id(self):
+        """
+        Test that creating a share with an invalid post ID returns a 400 error.
+        """
+        data = {"post": "invalid"}  # Invalid post ID
+        response = self.client.post('/shares/', data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_list_shared_posts_empty(self):
+        """
+        Test that no shared posts are returned if none exist.
+
+        Ensures that:
+        - The response status is 200 OK
+        - The result is an empty list
+        """
+        Share.objects.all().delete()  # Remove all share records
+        response = self.client.get('/shared-posts/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 0)

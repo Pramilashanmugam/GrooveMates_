@@ -93,18 +93,35 @@ class ShareDetail(generics.RetrieveDestroyAPIView):
 
 
 class UserSharedPostsView(generics.ListAPIView):
+    """
+    View to list posts that have been shared by the authenticated user.
+
+    Methods:
+        - `GET`: Retrieves a list of all posts shared by the authenticated
+        user.
+
+    Permissions:
+        - Read-only access for unauthenticated users.
+        - Authenticated users can view shared posts.
+
+    Returns:
+        Response: A list of posts that have been shared by the user.
+    """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = PostSerializer
 
     def get_queryset(self):
         """
         Fetch all the posts that have been shared.
-        Return the Post objects that are associated with the shares.
+
+        Returns:
+            QuerySet: A queryset of distinct Post objects that have been shared
+
+        Notes:
+            This filters for posts that have at least one associated share
+            (i.e., shared_posts__isnull=False).
         """
         # Fetch distinct posts that have been shared
-        shared_posts = Post.objects.filter(shared_posts__isnull=False).distinct()
-        return shared_posts  # Return distinct Post objects that have been shared
-
-
-
-
+        shared_posts = Post.objects.filter(
+            shared_posts__isnull=False).distinct()
+        return shared_posts

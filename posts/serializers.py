@@ -108,9 +108,8 @@ class PostSerializer(serializers.ModelSerializer):
     def get_shared_by(self, obj):
         shares = Share.objects.filter(post=obj)
         shared_users = [share.user.username for share in shares]
-        return shared_users if shared_users else []  # Return an empty list instead of None
-
-
+        # Return an empty list instead of None
+        return shared_users if shared_users else []
 
     def get_is_shared_by_user(self, obj):
         """
