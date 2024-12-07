@@ -1,131 +1,151 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+# Groovemates Backend API
 
-Welcome Pramila Shanmugam,
+**Advanced Front-End Portfolio Project(PP5) - Code Institute**
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. It's perfectly ok to use this template as the basis for your project submissions.
+The *Groovemates_backend API* is the backend for the Groovmates application, built using Django Rest Framework. It serves as the foundation for a social network ([Groovmates](https://groovemates-frontend-b3335269700f.herokuapp.com/)) focused on sharing the musical events across to spread the words for all the music lovers.<br>
 
-You can safely delete this README.md file or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use. Some of this information has been updated since the video content was created. The last update to this file was: **June 18, 2024**
+*Groovmates_backend API* is designed for users who want to create and join events, called "Post," which include a event, date, time, description, and location. Other users can show their interest by sharing, liking and commenting on the Posts. Each event is also open for comments and fostering communication.<br>
 
-## Gitpod Reminders
+Additionally, users have the ability to follow others, allowing them to stay updated on Groovmates.
+<br>
+The API is organized into several key apps:<br>
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
+_posts_: Manages the creation and details of events.<br>
+_profiles_: Handles user profiles and related information.<br>
+_Shares_: To show interest on a post and also share them to make it more reachable.<br>
+_comments_: Enables users to comment on Groovmatess.<br>
+_likes_: Allows users to like a Post they are interested in.<br>
+_reports_: Allows users to report a Post incase of irrelevant post.<br>
+_followers_: Facilitates the following and tracking of other users' activities.<br>
+<br>
+This API is designed to be consumed by a React frontend, providing a seamless experience for users looking to connect and engage in activities together.
+<br>
+The deployed API can be found here: [Groovmates API](https://groovemates-backend-b16861eb6026.herokuapp.com/)<br>
+The deployed React project can be found [here](https://groovemates-frontend-b3335269700f.herokuapp.com/)<br>
+The link for the GitHub repository to the associated front end can be found [here](https://github.com/Pramilashanmugam/GrooveMates_backend)
 
-`python3 -m http.server`
+## Table of Contents
 
-A blue button should appear to click: _Make Public_,
+- [User Experience](#user-experience)
+- [Structure](#structure)
+- [Database](#database)
+  - [Models](#models)
+- [API Endpoints](#api-endpoints)
+- [Bugs](#bugs)
+- [Technologies Used](#technologies-used)
+  - [Languages](#languages)
+  - [Tools](#tools)
+  - [Frameworks](#frameworks)
+  - [Libraries and modules](#libraries-and-modules)
+- [Testing](#testing)
+  - [Python Validator Testing](#python-validator-testing)
+  - [Manual testing](#manual-testing)
+  - [Automated Testing](#automated-testing)
+  - [Browser Compatibility](#browser-compatibility)
+- [Deployment](#deployment)
+  - [Heroku](#heroku)
+  - [Local deployment](#local-deployment)
+  - [Forking this GitHub repository](#forking-this-github-repository)
+  - [Clone this repository](#clone-this-repository)
+  - [Cloudinary](#cloudinary)
+  - [Create PostgreSQL using Code Institute Database Maker](#create-postgresql-using-code-institute-database-maker)
+- [Credits](#credits)
+  - [Code](#code)
+  - [ReadMe](#readme)
+  - [Acknowledgments](#acknowledgments)
 
-Another blue button should appear to click: _Open Browser_.
 
-To run a backend Python file, type `python3 app.py` if your Python file is named `app.py`, of course.
+## User Experience
 
-A blue button should appear to click: _Make Public_,
+I used an Agile methodology approach to plan this project. This was implemented through the GitHub Project board with epics, user stories and tasks.
+Each user story was classified with a label according to MoSCoW prioritization.<br>
+The Kanban board can be seen [here](https://github.com/users/Pramilashanmugam/projects/6).<br>
 
-Another blue button should appear to click: _Open Browser_.
+### Epics and User stories
 
-By Default, Gitpod gives you superuser security privileges. Therefore, you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+Here we have a limited Epics and userstories, as more userstories and epics added during development in frontend More about the user stories can be found in the [Readme for the frontend part here.](https://github.com/users/Pramilashanmugam/projects/7)
+<br>
 
-To log into the Heroku toolbelt CLI:
+List of Epics: <br>
+- [Epic: Interaction with posts](https://github.com/Pramilashanmugam/GrooveMates_backend/milestone/3)
+- [EPIC: Post Functionalities](https://github.com/Pramilashanmugam/GrooveMates_backend/milestone/2)
+- [Epic: User Registration and Profile Management](https://github.com/Pramilashanmugam/GrooveMates_backend/milestone/1)
 
-1. Log in to your Heroku account and go to *Account Settings* in the menu under your avatar.
-2. Scroll down to the *API Key* and click *Reveal*
-3. Copy the key
-4. In Gitpod, from the terminal, run `heroku_config`
-5. Paste in your API key when asked
+User Stories with their id:  <br>
+- As a developer, I need to create the base project set up so that I can build out the features. [#1](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/1)
+- As a user, I want to create an account with a unique username and password so that I can log in and manage my blog activities. [#2](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/2)
+- As a user, I want to create and update my profile with details like name, profile image, and bio to personalize my account. [#3](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/3)
+- As a user, I want to create a new post with details such as event name, description, location, date, time, and image, so I can share my experiences and information with others. [#4](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/4)
+- As a user, I want to edit or delete my posts to maintain control over the content I share. [#5](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/5)
+- As a user, I want to comment on posts to share my thoughts or ask questions about the content and also have CRUD functionality. [#6](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/6)
+- As a user, I want to like posts to show appreciation for the content shared by others. [#7](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/7)
+- As a user, I want to report posts or comments that violate community guidelines, so inappropriate content can be reviewed and addressed. [#8](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/8)
+- As a user, I want to share posts with other users, so I can highlight content I find interesting or useful. [#9](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/9)
+- As a developer, I want to create unit testing so that I can ensure the developed codes outcome meets the requirement. [#10](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/10)
+- As a user, I want to share a existing post so that i can show my interest on the post and also spreading the word about the event. [#11](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/11)
+- As a user, I want to see the count of followers, post and also the number of account i am following so that I can it gives me a clear picture on my visibility. [#12](https://github.com/Pramilashanmugam/GrooveMates_backend/issues/12)
 
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you, so do not share it. If you accidentally make it public, you can create a new one with _Regenerate API Key_.
+## Structure
 
-### Connecting your Mongo database
+The first database schema was crafted during the planning phase of the project. The second one was created after finishing the project. It only adds two created_at fields and renames some of the tables. Both schemas were created with [dbdiagramm](https://dbdiagram.io/home). 
 
-- **Connect to Mongo CLI on a IDE**
-- navigate to your MongoDB Clusters Sandbox
-- click **"Connect"** button
-- select **"Connect with the MongoDB shell"**
-- select **"I have the mongo shell installed"**
-- choose **mongosh (2.0 or later)** for : **"Select your mongo shell version"**
-- choose option: **"Run your connection string in your command line"**
-- in the terminal, paste the copied code `mongo "mongodb+srv://<CLUSTER-NAME>.mongodb.net/<DBname>" --apiVersion 1 --username <USERNAME>`
-  - replace all `<angle-bracket>` keys with your own data
-- enter password _(will not echo **\*\*\*\*** on screen)_
+![Initial Database Schema](documentation/readme/erd_initial_version.png)<br>
+Final ERD:<br>
+![Final Database Schema](documentation/readme/erd_final_version.png)<br>
 
-------
+## Database<br>
+I used a PostgreSQL provided by Code Institute as relational database.<br>
 
-## Release History
+- **FieldTypes:**<br>
+  - AutoField: An integer field that automatically increments.
+  - CharField: A text field with a maximum length.
+  - DateTimeField: A field for storing date and time.
+  - DateField: A field for storing dates.
+  - TimeField: A field for storing time.
+  - TextField: A large text field.
+  - ImageField: A field for uploading images, requires *upload_to* parameter to specify the directory where images will be uploaded.
+  - OneToOneField: A one-to-one relationship.
+  - ForeignKey: A many-to-one relationship.
+  - IntegerField: An integer field.
+<br>
+- **Relationships:**<br>
+  - A User has one Profile.
+  - A Profile belongs to one User.
+  - A Post is created by one User.
+  - A User can create many posts.
+  - A User can be a Share a post.
+  - A User can like a Post.
+  - A User can report many post.
+  - A User can create a Comment for a Post. 
+  - A Comment belongs to one User and one Post
+  - A User can follow another User.
 
-We continually tweak and adjust this template to help give you the best experience. Here is the version history:
+### Models
 
-**June 18, 2024,** Add Mongo back into template
+*Profile* <br>
+- The Profile model represents a user's profile in the application, automatically created when a new user is registered. It includes various fields to store personal information such as the user's name, profile image, date of creation and updation,also description. The model also tracks when the profile was created and last updated. The associated *ProfileSerializer* is responsible for serializing the profile data, adding additional computed fields like whether the requesting user owns the profile (is_owner), and validating the profile image size and dimensions. The serializer also integrates follower-related information, such as follower counts and the ID of the current user's following relationship with the profile owner, to support social features in the application.<br>
+<br>
 
-**June 14, 2024,** Temporarily remove Mongo until the key issue is resolved
+*Posts* <br>
+- The Posts model represents an event posted by a user within the application. Each posts includes details like the event name, image, the date and time it is scheduled to occur, the location, and a description and automatically tracks when the event was created and last updated. The associated *PostsSerializer* handles serialization of this data, adding additional fields to represent the ownership status, profile information of the post creator, likes, shared_by, report details, and counts of likes, comments, and shares. The serializer also ensures that the event's date is in the future and not greater than 10 years from current date and that any uploaded images meet specific size and dimension requirements.<br>
 
-**May 28 2024:** Fix Mongo and Links installs
+*Shares* <br>
+- The Shares model represents a user who wants to share a existing post which he finds interesting, it will extract the post details and includes the users who have shared it." Each share is linked to both a user and a Posts, capturing the relationship between users and the post. The associated *ShareSerializer* is responsible for serializing the list of shared post, including details about the shared user and the event, and handles validation to preventing a user not to share same post more than once. The serializer raises an error if the user tries to share more than once.<br> 
 
-**April 26 2024:** Update node version to 16
+*Reports* <br>
+- The Report model represents a user to raise his concern on a post if it is irrelevant. Report model includes fields like reporter, list of reasons, post, description and status. The report page is restricted only for admin use to avoid any misuse. The superuser can access all the reports and take necessary action.<br> 
 
-**September 20 2023:** Update Python version to 3.9.17.
+*Likes*<br>
+- The likes model represents a user liking a specific Posts for showing his interest. Each like links a user to a Posts, recording when the likes was created. The model enforces that a user can only likes a Post once, ensuring no duplicates. The associated *likesSerializer* is responsible for handling the serialization of likes data, including the user and event details. It also includes validation logic to raise an error if a user attempts to likes the same event more than once. This structure supports a clean and efficient way to manage user likes within the application.<br>
 
-**September 1 2021:** Remove `PGHOSTADDR` environment variable.
+*Comment*<br>
+- The Comment model is designed to manage user-generated comments on specific Postss. Each comment is associated with a user (owner) and a Posts, capturing the content of the comment along with timestamps for when it was created and last updated. The model ensures that comments are displayed in reverse chronological order by default, showing the most recent ones first.
+The associated *CommentSerializer* handles the serialization of comment data, including details about the user who made the comment, their profile picture, and the timestamps formatted in a human-readable manner. The CommentDetailSerializer extends this by providing additional details, such as the ID of the associated Posts event. This setup enables efficient management and display of comments within the application, fostering interaction and discussion around Posts events.<br>
 
-**July 19 2021:** Remove `font_fix` script now that the terminal font issue is fixed.
+*Follower*<br>
+- The Follower model manages the relationships where users follow other users within the application. It establishes a connection between the owner (the user who is following) and the followed (the user being followed), allowing for tracking of these interactions. Each follow relationship is time-stamped, showing when it was created, and the model enforces uniqueness to prevent duplicate follow relationships. The data is ordered by the most recent followings by default.
+The *FollowerSerializer* is responsible for converting these follow relationships into a serialized format for API responses. It includes fields for the usernames of both the follower and the followed, and it prevents users from following themselves or following the same user multiple times. This ensures the integrity of the following system within the application, supporting functionalities like displaying followers, following counts, and managing user connections.
 
-**July 2 2021:** Remove extensions that are not available in Open VSX.
-
-**June 30 2021:** Combined the P4 and P5 templates into one file, added the uptime script. See the FAQ at the end of this file.
-
-**June 10 2021:** Added: `font_fix` script and alias to fix the Terminal font issue
-
-**May 10 2021:** Added `heroku_config` script to allow Heroku API key to be stored as an environment variable.
-
-**April 7 2021:** Upgraded the template for VS Code instead of Theia.
-
-**October 21 2020:** Versions of the HTMLHint, Prettier, Bootstrap4 CDN and Auto Close extensions updated. The Python extension needs to stay the same version for now.
-
-**October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
-
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
-
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
-
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
-
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
-
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
-
-------
-
-## FAQ about the uptime script
-
-**Why have you added this script?**
-
-It will help us to calculate how many running workspaces there are at any one time, which greatly helps us with cost and capacity planning. It will help us decide on the future direction of our cloud-based IDE strategy.
-
-**How will this affect me?**
-
-For everyday usage of Gitpod, it doesn’t have any effect at all. The script only captures the following data:
-
-- An ID that is randomly generated each time the workspace is started.
-- The current date and time
-- The workspace status of “started” or “running”, which is sent every 5 minutes.
-
-It is not possible for us or anyone else to trace the random ID back to an individual, and no personal data is being captured. It will not slow down the workspace or affect your work.
-
-**So….?**
-
-We want to tell you this so that we are being completely transparent about the data we collect and what we do with it.
-
-**Can I opt out?**
-
-Yes, you can. Since no personally identifiable information is being captured, we'd appreciate it if you let the script run; however if you are unhappy with the idea, simply run the following commands from the terminal window after creating the workspace, and this will remove the uptime script:
-
-```
-pkill uptime.sh
-rm .vscode/uptime.sh
-```
-
-**Anything more?**
-
-Yes! We'd strongly encourage you to look at the source code of the `uptime.sh` file so that you know what it's doing. As future software developers, it will be great practice to see how these shell scripts work.
-
----
-
-Happy coding!
+*Home*<br>
+A welcome message is displayed when you first enter the API site.
+![Screenshot of welcome message](documentation/readme/welcome_message.png)<br>
