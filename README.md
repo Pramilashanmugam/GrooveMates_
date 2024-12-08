@@ -2,9 +2,9 @@
 
 **Advanced Front-End Portfolio Project(PP5) - Code Institute**
 
-The *Groovemates_backend API* is the backend for the Groovmates application, built using Django Rest Framework. It serves as the foundation for a social network ([Groovmates](https://groovemates-frontend-b3335269700f.herokuapp.com/)) focused on sharing the musical events across to spread the words for all the music lovers.<br>
+The *Groovemates_backend API* is the backend for the groovmates-frontend application, built using Django Rest Framework. It serves as the foundation for a social network ([groovmates-frontend](https://groovemates-frontend-b3335269700f.herokuapp.com/)) focused on sharing the musical events across to spread the words for all the music lovers.<br>
 
-*Groovmates_backend API* is designed for users who want to create and join events, called "Post," which include a event, date, time, description, and location. Other users can show their interest by sharing, liking and commenting on the Posts. Each event is also open for comments and fostering communication.<br>
+*Groovmates_backend API* is designed for users who want to create and share some musical events happening in and around which would help music lovers to get benefitted by joining such events. As a music lover, i felt this website would help all the music lovers to get engaged by visiting such events. The events can be created using 'Post' which include a event, date, time, description and location. Other users can show their interest by sharing, liking and commenting on the Posts. Each event is also open for comments and fostering communication.<br>
 
 Additionally, users have the ability to follow others, allowing them to stay updated on Groovmates.
 <br>
