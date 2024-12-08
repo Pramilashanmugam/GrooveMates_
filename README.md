@@ -191,6 +191,35 @@ The endpoints provided by the API are:<br>
 
 ## Bugs
 
+<details>
+<summary>AssertionError at /profiles/</summary>
+<br>
+The error occurs because the fields posts_count, followers_count, and following_count are referenced in the ProfileSerializer but aren't included in the fields list in the serializer's Meta class. Updated posts_count, followers_count, and following_count fields in the Meta has resolved the issue.
+<br>
+</details>
+
+<details>
+<summary> 400 error on deployment at heroku</summary>
+<br>
+The ALLOWED_HOST was missed in the heroku and caused 400 error. Was rectified after updating the Allowed_host in deployment correctly.
+<br>
+<br>
+
+![Screenshot of the error message in browser](documentation/readme/error_400_deployment.png)<br>
+![Screenshot of the error message in browser](documentation/readme/reason_for_400.png)<br>
+
+</details>
+
+<details>
+<summary> Type error at posts/views.py</summary>
+<br>
+Due to non-model fields name in Meta.fields at posts/views.py. Got the typeerrror. Which was rectified after removing the non-model fields.
+<br>
+<br>
+
+![Screenshot of the error message in browser](documentation/readme/typeerror_views.png)<br>
+
+</details>
 
 ## Technologies Used
 
@@ -570,7 +599,7 @@ To see the [view of the live site](https://groovemates-backend-b16861eb6026.hero
 ### Acknowledgements
 
 - I would like to thank my wonderful mentor Gareth McGirr for his numerous tips and great assistance during the creation of this project.  
-- A big thank you to [Dennis Schenkel](https://github.com/DennisSchenkel) for all his help on this project, especially for assisting me by reviewing my project. 
+- A big thank you to [Dennis Schenkel](https://github.com/DennisSchenkel) for all his timely suggestion on this project, especially for assisting me by reviewing my project. 
 - Furthermore, I would like to give a shoutout to the wonderful tutor team who helped me numerous times when I was stuck and struggling to achieve the results I was aiming for. Your support and guidance have been amazing. Thank you!
 
 **This is for educational use.**
