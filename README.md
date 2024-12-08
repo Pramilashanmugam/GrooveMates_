@@ -12,7 +12,7 @@ The API is organized into several key apps:<br>
 
 _posts_: Manages the creation and details of events.<br>
 _profiles_: Handles user profiles and related information.<br>
-_Shares_: To show interest on a post and also share them to make it more reachable.<br>
+_shares_: To show interest on a post and also share them to make it more reachable.<br>
 _comments_: Enables users to comment on Groovmatess.<br>
 _likes_: Allows users to like a Post they are interested in.<br>
 _reports_: Allows users to report a Post incase of irrelevant post.<br>
@@ -147,5 +147,5 @@ The associated *CommentSerializer* handles the serialization of comment data, in
 The *FollowerSerializer* is responsible for converting these follow relationships into a serialized format for API responses. It includes fields for the usernames of both the follower and the followed, and it prevents users from following themselves or following the same user multiple times. This ensures the integrity of the following system within the application, supporting functionalities like displaying followers, following counts, and managing user connections.
 
 *Home*<br>
-A welcome message is displayed when you first enter the API site.
+A welcome message is displayed when you first enter the API site.<br>
 ![Screenshot of welcome message](documentation/readme/welcome_message.png)<br>

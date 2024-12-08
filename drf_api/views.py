@@ -21,7 +21,7 @@ Functions:
 @api_view()
 def root_route(request):
     return Response({
-        "message": "Welcome to my drf API"
+        "message": "Welcome to my Groovemates drf_API"
     })
 
 
