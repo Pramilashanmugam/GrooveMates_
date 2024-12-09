@@ -106,6 +106,15 @@ class PostSerializer(serializers.ModelSerializer):
             return like.id if like else None
         return None
 
+    def get_is_liked_by_user(self, obj):
+        """
+        Checks if the authenticated user has liked the post.
+        """
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return Like.objects.filter(owner=user, post=obj).exists()
+        return False  # Return False if the user is not authenticated
+
     def get_shared_by(self, obj):
         shares = Share.objects.filter(post=obj)
         shared_users = [share.user.username for share in shares]
