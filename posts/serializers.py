@@ -20,11 +20,12 @@ class PostSerializer(serializers.ModelSerializer):
     # Computed fields based on user interactions
     is_owner = serializers.SerializerMethodField()
     like_id = serializers.SerializerMethodField()
+    is_liked_by_user = serializers.SerializerMethodField()
     shared_by = serializers.SerializerMethodField()
     is_shared_by_user = serializers.SerializerMethodField()
 
     # Read-only aggregate data fields
-    likes_count = serializers.ReadOnlyField()
+    likes_count = serializers.SerializerMethodField()
     comments_count = serializers.ReadOnlyField()
     share_count = serializers.ReadOnlyField()
 
@@ -119,6 +120,12 @@ class PostSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             return Share.objects.filter(user=user, post=obj).exists()
         return False  # Return False if the user is not authenticated
+    
+    def get_likes_count(self, obj):
+        """
+        Gets the total count of likes for the post, including shared posts.
+        """
+        return Like.objects.filter(post=obj).count()
 
     class Meta:
         model = Post
@@ -127,5 +134,5 @@ class PostSerializer(serializers.ModelSerializer):
             'description', 'image', 'location', 'date', 'time', 'is_owner',
             'profile_id', 'profile_image', 'image_filter', 'like_id',
             'likes_count', 'comments_count', 'share_count', 'shared_by',
-            'is_shared_by_user'
+            'is_shared_by_user', 'is_liked_by_user'
         ]
