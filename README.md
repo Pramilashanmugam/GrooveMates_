@@ -176,6 +176,7 @@ The endpoints provided by the API are:<br>
 |                                              | POST        | Create         |
 | /shares/\\<int:pk\\>/                        | GET         | Read           |
 |                                              | DELETE      | Delete         |
+| /shared-posts/                               | GET         | Read           |
 | /reports/                                    | GET         | Read           |
 |                                              | POST        | Create         |
 | reports/\\<int:pk\\>/(superusers/admin only) | GET         | Read           |
@@ -187,7 +188,6 @@ The endpoints provided by the API are:<br>
 | /likes/\\<int:pk\\>/                         | GET         | Read           |
 |                                              | DELETE      | Delete         |
 |                                              |             |
-
 
 ## Bugs
 
@@ -599,7 +599,7 @@ To see the [view of the live site](https://groovemates-backend-b16861eb6026.hero
 ### Acknowledgements
 
 - I would like to thank my wonderful mentor Gareth McGirr for his numerous tips and great assistance during the creation of this project.  
-- A big thank you to [Dennis Schenkel](https://github.com/DennisSchenkel) for all his timely suggestion on this project, especially for assisting me by reviewing my project. 
+- A big thank you to [Dennis Schenkel](https://github.com/DennisSchenkel) for all his timely suggestion on this project, especially for assisting me by reviewing my project and noticing a bug, which helped me resolve before submission. 
 - Furthermore, I would like to give a shoutout to the wonderful tutor team who helped me numerous times when I was stuck and struggling to achieve the results I was aiming for. Your support and guidance have been amazing. Thank you!
 
 **This is for educational use.**

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from shares.models import Share
 from posts.models import Post
 from likes.models import Like
-from comments.models import Comment 
+from comments.models import Comment
 from datetime import datetime, timedelta
 
 
@@ -130,17 +130,18 @@ class PostSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             return Share.objects.filter(user=user, post=obj).exists()
         return False  # Return False if the user is not authenticated
-    
+
     def get_likes_count(self, obj):
         """
         Gets the total count of likes for the post, including shared posts.
         """
         return Like.objects.filter(post=obj).count()
-    
+
     def get_share_count(self, obj):
         """
         Get the total number of shares for this post.
-        For shared posts, count shares on both the original post and any shared posts.
+        For shared posts, count shares on both the original post and any shared
+        posts.
         """
         return Share.objects.filter(post=obj).count()
 
