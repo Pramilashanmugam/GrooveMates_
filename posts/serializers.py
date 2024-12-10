@@ -2,6 +2,7 @@ from rest_framework import serializers
 from shares.models import Share
 from posts.models import Post
 from likes.models import Like
+from comments.models import Comment 
 from datetime import datetime, timedelta
 
 
@@ -26,7 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     # Read-only aggregate data fields
     likes_count = serializers.SerializerMethodField()
-    comments_count = serializers.ReadOnlyField()
+    comments_count = serializers.SerializerMethodField()
     share_count = serializers.SerializerMethodField()
 
     # Formatting fields for date and time
@@ -142,6 +143,12 @@ class PostSerializer(serializers.ModelSerializer):
         For shared posts, count shares on both the original post and any shared posts.
         """
         return Share.objects.filter(post=obj).count()
+
+    def get_comments_count(self, obj):
+        """
+        Returns the count of comments for the post or shared post.
+        """
+        return Comment.objects.filter(post=obj).count()
 
     class Meta:
         model = Post
